@@ -1,22 +1,80 @@
+scalar DateTime
+scalar BigDecimal
+
+
 type Asset {
-    symbol: String!
-    name: String!
-    currentPrice: Float!
-    change24h: Float!
-    lastUpdated: String!
+    symbol:        String!
+    name:          String!
+    exchange:      String!
+
+    # Price
+    currentPrice:  BigDecimal!
+    bidPrice:      BigDecimal
+    askPrice:      BigDecimal
+
+    # 24h stats
+    change24h:     BigDecimal!
+    changePct24h:  BigDecimal!
+    high24h:       BigDecimal
+    low24h:        BigDecimal
+    volume24h:     BigDecimal
+
+    lastUpdated:   DateTime!
+    seqNo:         Int!
 }
 
 type Query {
-    # Get initial data for the dashboard
-    latestPrices(symbols: [String!]): [Asset!]!
+    latestPrices(symbols: [String!], exchange: String): [Asset!]!
+    trackedSymbols: [TrackedSymbol!]!
+    myAlerts: [PriceAlert!]!
+}
+
+type TrackedSymbol {
+    symbol:      String!
+    exchange:    String!
+    subscribers: Int!
 }
 
 type Subscription {
-    # The live "Ticker"
-    marketTicks(symbols: [String!]): Asset!
+    marketTicks(symbols: [String!], exchange: String): Asset!
+    priceAlertTriggered(alertId: ID!): AlertEvent!
 }
 
 type Mutation {
-    # For a "Production" feel, allow users to set price alerts
-    setPriceAlert(symbol: String!, targetPrice: Float!): Boolean!
+    setPriceAlert(input: PriceAlertInput!): PriceAlert!
+
+    cancelPriceAlert(alertId: ID!): Boolean!
+}
+
+input PriceAlertInput {
+    symbol:      String!
+    targetPrice: BigDecimal!
+    direction:   AlertDirection!
+}
+
+enum AlertDirection {
+    ABOVE
+    BELOW
+}
+
+type PriceAlert {
+    id:          ID!
+    symbol:      String!
+    targetPrice: BigDecimal!
+    direction:   AlertDirection!
+    status:      AlertStatus!
+    createdAt:   DateTime!
+    triggeredAt: DateTime
+}
+
+enum AlertStatus {
+    ACTIVE
+    TRIGGERED
+    CANCELLED
+}
+
+type AlertEvent {
+    alert:        PriceAlert!
+    triggerPrice: BigDecimal!
+    triggeredAt:  DateTime!
 }

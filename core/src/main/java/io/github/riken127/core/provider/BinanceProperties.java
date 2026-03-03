@@ -1,4 +1,4 @@
 package io.github.riken127.core.provider;
 
-public class BinanceProvider {
+public class BinanceProperties {
 }
