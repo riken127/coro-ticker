@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: app
+  graphql:
+    websocket:
+      path: /graphql
+      connection-init-timeout: 60s

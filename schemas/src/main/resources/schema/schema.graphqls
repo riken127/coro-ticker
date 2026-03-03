@@ -1,0 +1,22 @@
+type Asset {
+    symbol: String!
+    name: String!
+    currentPrice: Float!
+    change24h: Float!
+    lastUpdated: String!
+}
+
+type Query {
+    # Get initial data for the dashboard
+    latestPrices(symbols: [String!]): [Asset!]!
+}
+
+type Subscription {
+    # The live "Ticker"
+    marketTicks(symbols: [String!]): Asset!
+}
+
+type Mutation {
+    # For a "Production" feel, allow users to set price alerts
+    setPriceAlert(symbol: String!, targetPrice: Float!): Boolean!
+}
